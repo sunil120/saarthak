@@ -1,0 +1,7 @@
+.wcs-controls{
+	opacity: 0;
+}
+
+.wcs-wrapper:hover .wcs-controls{
+	opacity: 1;
+}

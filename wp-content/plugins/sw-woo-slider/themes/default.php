@@ -11,6 +11,8 @@
 				'compare'	=> 'IN'
 			)			
 		),
+		'meta_key'		=> 'recommend_product',
+		'meta_value'	=> 'yes',
 		'ignore_sticky_posts'	=> 1,
 		'posts_per_page' 		=> $numberposts,
 		'orderby' 				=> $orderby,
