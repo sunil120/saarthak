@@ -8,3 +8,14 @@ Template:   sw_atom
 Version:    1.0.4
 License:    GNU General Public License v2 or later
 */
+
+.header .top .ya-logo {
+    margin-top: -8px;
+    padding: 0;
+}
+
+body img {
+    display: block;
+    max-width: 90%;
+    height: auto;
+}
