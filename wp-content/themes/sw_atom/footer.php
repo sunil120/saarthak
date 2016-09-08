@@ -22,7 +22,7 @@
 		<div class="container clearfix">
 			<div class="col-lg-8 col-md-8 col-sm-8 pull-left clearfix">
 				<div class="copyright-text pull-left">
-					<p>&copy;<?php echo date('Y'); ?> <a href="http://www.smartaddons.com/wordpress/theme-showcase"><?php esc_html_e('Wordpress Theme ', 'yatheme'); ?></a><?php esc_html_e('SW Atom Store. All Rights Reserved. Designed by ','yatheme'); ?><a class="mysite" href="http://www.smartaddons.com/"><?php esc_html_e('Smartaddons.com','yatheme');?></a>.</p>
+                                    <p>&copy;<?php echo date('Y'); ?> <a href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php esc_html_e('Saarthak Store', 'yatheme'); ?></a><?php esc_html_e('All Rights Reserved. ','yatheme'); ?></p>
 				</div>
 			</div>
 			<?php if (is_active_sidebar_YA('footer-copyright')){ ?>
