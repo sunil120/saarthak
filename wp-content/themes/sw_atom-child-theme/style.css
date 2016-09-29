@@ -19,3 +19,26 @@ body img {
     max-width: 90%;
     height: auto;
 }
+.widget_icl_lang_sel_widget #lang_sel a.lang_sel_sel:after {
+  content: "\f107";
+  font-family: FontAwesome;
+  display: none;
+  font-size: 12px;
+}
+.widget_currency_converter .currency_w >li a:after {
+    content: "\f107";
+    font-family: FontAwesome;
+    display:none;
+    margin-left: 5px;
+    font-size: 12px;
+}
+.widget_icl_lang_sel_widget {
+    border-left: none;
+    border-right: none;
+}
+.widget_currency_converter {
+border-right:none;
+}
+ul#menu-top-header > li:first-child {border:none}
+ul#menu-top-header > li {border:none}
+.header-style1 .top-login .div-logined{border:none}

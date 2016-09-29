@@ -72,6 +72,7 @@ class woocsvExportProduct
         '_height',
         '_width',
         '_default_attributes',
+        '_variation_description',
     );
 
     /**

@@ -56,19 +56,19 @@ class woocsv_import
         17 => 'tax_status',
         18 => 'tax_class',
         19 => 'stock_status',    // instock, outofstock
-        20 => 'visibility',    // visible, catelog, search, hidden
-        21 => 'backorders',    // yes,no
+        20 => 'visibility',      // visible, catelog, search, hidden
+        21 => 'backorders',      // yes,no
         22 => 'featured',        // yes,no
         23 => 'manage_stock',    // yes,no
         24 => 'featured_image',
         25 => 'product_gallery',
         26 => 'shipping_class',
-        27 => 'comment_status', //closed, open
+        27 => 'comment_status',  //closed, open
         28 => 'change_stock',    // +1 -1 + 5 -8
         29 => 'ID',
-        30 => 'ping_status',        // open,closed
+        30 => 'ping_status',     // open,closed
         31 => 'menu_order',
-        32 => 'post_author',    //user name or nice name of an user
+        32 => 'post_author',     //user name or nice name of an user
         33 => 'post_date',
     );
 
@@ -97,6 +97,8 @@ class woocsv_import
         add_action( 'wp_ajax_run_import', array ( $this, 'run_import' ) );
 
         $this->upload_dir = wp_upload_dir();
+
+        $this->fields = apply_filters('allaerd_importer_fields', $this->fields);
     }
 
     public function load_dependenies ()

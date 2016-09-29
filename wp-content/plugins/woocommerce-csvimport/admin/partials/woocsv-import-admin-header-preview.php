@@ -58,23 +58,20 @@
     {
         // if field of is the same as the saved field in the same place -> selected
         // if field is the same header field --> selected
+        $original = $field;
         $field = trim( strtolower( $field ) );
         $saved_field = trim( strtolower( $saved_fields[ $i ] ) );
         $header_field = trim( strtolower( $lines[ 0 ][ $i ] ) );
 
         if ($field == $saved_field) {
-            echo '<option value="' . $field . '" selected>';
-
-            return;
+            return '<option value="' . $original . '" selected>';
         }
 
         if ($field == $header_field) {
-            echo '<option value="' . $field . '" selected>';
-
-            return;
+            return '<option value="' . $original . '" selected>';
         }
 
-        echo '<option value="' . $field . '">';
+        return '<option value="' . $original . '">';
     }
 
 

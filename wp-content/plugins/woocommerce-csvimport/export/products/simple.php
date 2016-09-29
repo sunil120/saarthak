@@ -54,7 +54,11 @@ class simple implements productsInterface
         $this->images();
         $this->attributes();
         $this->defaultAttributes();
+        $this->setPostparentSku();
+
     }
+
+
 
     public function body ()
     {
@@ -131,6 +135,8 @@ class simple implements productsInterface
         }
 
         $this->content[ 'tags' ] = implode( '|', $tags );
+
+        return true;
     }
 
     public function images ()
@@ -233,6 +239,27 @@ class simple implements productsInterface
         }
 
         $this->content[ '_default_attributes' ] = implode( $atts, '|' );
+
+        return true;
+    }
+
+    private function setPostparentSku()
+    {
+        $parent_id = $this->content[ 'post_parent' ];
+        if (empty($parent_id)) {
+            return;
+        }
+
+        $parent_sku = get_post_meta($parent_id, '_sku',true);
+        if ($parent_sku) {
+            $this->content[ 'post_parent' ] = $parent_sku;
+
+            return;
+        }
+
+        $this->content[ 'post_parent' ] = '';
+
+        return;
 
     }
 

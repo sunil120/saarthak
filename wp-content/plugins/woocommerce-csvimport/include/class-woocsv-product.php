@@ -218,7 +218,6 @@ class woocsv_import_product
 
     public function save ()
     {
-        global $woocsv_import;
 
         // @since 3.0.2 if skip is true, skip the product during import
         if ($this->skip) {
@@ -236,12 +235,15 @@ class woocsv_import_product
         $post_id = wp_insert_post( $this->body, TRUE );
 
         if (is_wp_error( $post_id )) {
-            $this->logger->log( __( 'Product could not be saved and skipped', 'woocommerce-csvimport' ) );
 
+            $this->logger->log( __( 'Product could not be saved and skipped', 'woocommerce-csvimport' ) );
             return FALSE;
+
         } else {
+
             $this->logger->log( sprintf( __( 'Product saved with ID: %s', 'woocommerce-csvimport' ), $post_id ) );
             $this->body[ 'ID' ] = $post_id;
+
         }
 
         do_action( 'woocsv_product_after_body_save' );
@@ -265,9 +267,10 @@ class woocsv_import_product
 
         do_action( 'woocsv_product_before_images_save' );
 
-        // added empty() else it overrrides the above function)
         if (!empty($this->featured_image)) {
             $this->save_featured_image();
+        } else {
+            $this->logger->log(__('No featured image available ','woocommerce-csvimport'));
         }
 
         //save the product gallery
@@ -654,7 +657,7 @@ class woocsv_import_product
 
         //check if there is a featured image
         if (in_array( 'featured_image', $this->header )) {
-            $key = array_search( 'featured_image', $this->header );
+            $key = array_search('featured_image', $this->header);
             $this->featured_image = $this->raw_data[ $key ];
         }
 
@@ -664,6 +667,8 @@ class woocsv_import_product
             $this->product_gallery = $this->raw_data[ $key ];
         }
 
+        $this->logger->log(__($this->featured_image, 'woocommerce-csvimport'));
+
         do_action( 'woocsv_product_after_fill_in_data' );
 
     }
@@ -672,7 +677,7 @@ class woocsv_import_product
     {
 
         if (!$num) {
-            return;
+            return false;
         }
 
         $dotPos = strrpos( $num, '.' );

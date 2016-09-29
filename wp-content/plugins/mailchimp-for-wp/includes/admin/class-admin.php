@@ -29,11 +29,6 @@ class MC4WP_Admin {
 	protected $ads;
 
 	/**
-	 * @var MC4WP_Update_Optin
-	 */
-	protected $update_optin;
-
-	/**
 	 * Constructor
 	 *
 	 * @param MC4WP_Admin_Messages $messages
@@ -45,9 +40,6 @@ class MC4WP_Admin {
 		$this->plugin_file = plugin_basename( MC4WP_PLUGIN_FILE );
 		$this->ads = new MC4WP_Admin_Ads();
 		$this->load_translations();
-
-		// update opt-in
-		$this->update_optin = new MC4WP_Update_Optin( '4.0.0', $this->plugin_file, MC4WP_PLUGIN_DIR . 'includes/views/parts/update-4.x-notice.php' );
 	}
 
 	/**
@@ -70,7 +62,6 @@ class MC4WP_Admin {
 
 		$this->ads->add_hooks();
 		$this->messages->add_hooks();
-		$this->update_optin->add_hooks();
 	}
 
 	/**
@@ -116,7 +107,7 @@ class MC4WP_Admin {
 		do_action( 'mc4wp_admin_' . $action );
 
 		// redirect back to where we came from
-		$redirect_url = remove_query_arg( '_mc4wp_action' );
+		$redirect_url = ! empty( $_POST['_redirect_to'] ) ? $_POST['_redirect_to'] : remove_query_arg( '_mc4wp_action' );
 		wp_redirect( $redirect_url );
 		exit;
 	}
@@ -136,6 +127,7 @@ class MC4WP_Admin {
 		 * Use this hook to register your own dashboard widgets for users with the required capability.
 		 *
 		 * @since 3.0
+         * @ignore
 		 */
 		do_action( 'mc4wp_dashboard_setup' );
 
@@ -154,19 +146,32 @@ class MC4WP_Admin {
 			update_option( 'mc4wp_version', $previous_version );
 		}
 
-		// Only run if db option is at older version than code constant
 		$previous_version = get_option( 'mc4wp_version', 0 );
 
-		// This ! check means we're not running when installing the plugin
-		if( ! $previous_version ) {
-			return false;
-		}
+        // allow setting migration version from URL, to easily re-run previous migrations.
+        if( isset( $_GET['mc4wp_run_migration'] ) ) {
+            $previous_version = $_GET['mc4wp_run_migration'];
+        }
 
-		// This means someone did a rollback.
-		if( version_compare( $previous_version, MC4WP_VERSION, '>' ) ) {
-			update_option( 'mc4wp_version', MC4WP_VERSION );
-			return false;
-		}
+        // Ran upgrade routines before?
+        if( empty( $previous_version ) ) {
+            update_option( 'mc4wp_version', MC4WP_VERSION );
+
+            // if we have at least one form, we're going to run upgrade routine for v3 => v4 anyway.
+            // TODO: Remove this once we hit 4.2.x
+            $posts = get_posts( array( 'post_type' => 'mc4wp-form', 'numberposts' => 1 ) );
+            if( empty( $posts ) ) {
+                return false;
+            }
+
+            $previous_version = '3.9';
+        }
+
+        // Rollback'ed?
+        if( version_compare( $previous_version, MC4WP_VERSION, '>' ) ) {
+            update_option( 'mc4wp_version', MC4WP_VERSION );
+            return false;
+        }
 
 		// This means we're good!
 		if( version_compare( $previous_version, MC4WP_VERSION ) > -1 ) {
@@ -431,7 +436,19 @@ class MC4WP_Admin {
 	 */
 	public function show_generals_setting_page() {
 		$opts = mc4wp_get_options();
-		$connected = ( mc4wp('api')->is_connected() );
+        
+        try {
+            $connected = $this->get_api()->is_connected();
+        } catch( MC4WP_API_Connection_Exception $e ) {
+            $message = sprintf( "<strong>%s</strong><br /> %s", __( "Error connecting to MailChimp:", 'mailchimp-for-wp' ), $e );
+            $message .= '<br /><br />' . sprintf( '<a href="%s">' . __( 'Here\'s some info on solving common connectivity issues.', 'mailchimp-for-wp' ) . '</a>', 'https://mc4wp.com/kb/solving-connectivity-issues/#utm_source=wp-plugin&utm_medium=mailchimp-for-wp&utm_campaign=settings-notice' );
+            $this->messages->flash( $message, 'error' );
+            $connected = false;
+        } catch( MC4WP_API_Exception $e ) {
+            $this->messages->flash( sprintf( "<strong>%s</strong><br /> %s", __( "MailChimp returned the following error:", 'mailchimp-for-wp' ), $e ), 'error' );
+            $connected = false;
+        }
+
 		$lists = $this->mailchimp->get_lists();
 		$obfuscated_api_key = mc4wp_obfuscate_string( $opts['api_key'] );
 		require MC4WP_PLUGIN_DIR . 'includes/views/general-settings.php';
@@ -514,5 +531,12 @@ class MC4WP_Admin {
 	protected function get_log() {
 		return mc4wp('log');
 	}
+
+    /**
+     * @return MC4WP_API_v3
+     */
+	protected function get_api() {
+	    return mc4wp('api');
+    }
 
 }

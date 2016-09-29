@@ -21,13 +21,13 @@ define('WP_MEMORY_LIMIT', '64M');
  
 // ** MySQL settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
-define('DB_NAME', 'sarthak');
+define('DB_NAME', 'saarthak');
 
 /** MySQL database username */
 define('DB_USER', 'root');
 
 /** MySQL database password */
-define('DB_PASSWORD', '');
+define('DB_PASSWORD', 'Saarthak@1235');
 
 /** MySQL hostname */
 define('DB_HOST', 'localhost');
@@ -55,7 +55,7 @@ define('AUTH_SALT',        'iP7%M=?.>5=KJAUdrvoRF1:>i+[MH/w^n7qWLq&S><#?&99:*@v&
 define('SECURE_AUTH_SALT', 'N]-r>s/^c~8]foefy|[eMB~ufdNee#(p-[EeqIp7&s-do<+;sdbiVxOROa1J>UCm');
 define('LOGGED_IN_SALT',   'I(&H+e;v.iZ?svn_vgc+^y|vef1TqdaOdfB|bLK7J?/af:-i^#i$++eoG>Ox*/42');
 define('NONCE_SALT',       '_!H)0Wv=wH%16L.G:FAe|$bFz7lN`qXr<@)y3BMYlt-.3ddE2S8?8&42UMlW;-@)');
-
+define('FS_METHOD', 'direct');
 /**#@-*/
 
 /**

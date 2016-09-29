@@ -1,4 +1,6 @@
 <?php
+use Allaerd\UploadErrorMessages;
+
 class woocsv_import_admin
 {
 
@@ -58,13 +60,13 @@ class woocsv_import_admin
 			'58.15011976');			
 			
 			//settings page
-			add_submenu_page( 'woocsv_import', 'Settings', __('Settings','woocommerce-csvimport'), 'manage_options', 'woocsv-settings', array($this, 'settings'));
+			add_submenu_page( 'woocsv_import', 'Settings', __('Settings','woocommerce-csvimport'), current($current_role), 'woocsv-settings', array($this, 'settings'));
 		
 			//add-ons
-			add_submenu_page( 'woocsv_import', 'Docs', __('Docs','woocommerce-csvimport'), 'manage_options', 'woocsv-docs', array($this, 'docs'));
+			add_submenu_page( 'woocsv_import', 'Docs', __('Docs','woocommerce-csvimport'), current($current_role), 'woocsv-docs', array($this, 'docs'));
 			
 			//documentation
-			add_submenu_page( 'woocsv_import', 'Add-ons', '<span style="color:#ef6c00">'.__('Add-ons','woocommerce-csvimport').'</span>', 'manage_options', 'woocsv-addons', array($this, 'addons'));
+			add_submenu_page( 'woocsv_import', 'Add-ons', '<span style="color:#ef6c00">'.__('Add-ons','woocommerce-csvimport').'</span>', current($current_role), 'woocsv-addons', array($this, 'addons'));
 		
 			//js and css
 			add_action( 'admin_print_scripts-' .$page, array( $this,'enqueue_scripts' ) );
@@ -83,13 +85,12 @@ class woocsv_import_admin
 	public function import () {
 		global $woocsv_import;
 		
-		//what page to load?
-
 		/* ! HEADER */
-
         if ( isset ($_FILES['csvfile']) &&  $_FILES['csvfile']['error'] != 0 ) {
+
+			$fileErrorMessage = ($_FILES['csvfile']['error'])?:'unknown';
             echo '<div class="error"><p>';
-            echo __('Something went wrong during the file upload, make sure the file is not to big!','woocommerce-csvimport');
+            echo sprintf( __('Something went wrong during the file upload, error message: %s','woocommerce-csvimport'), UploadErrorMessages::convertErrorToMessage($_FILES[ 'csvfile'][ 'error']) );
             echo '</p></div>';
         }
 
@@ -205,7 +206,7 @@ class woocsv_import_admin
 		// localize javascript
 		//======================================
 		$strings = array (
-			'error' => __( 'Something went wrong. We could not make a connection with the server. Check your permissions and rights the do ajax requests!','woocommerce-csvimport' ),
+			'error' => __( 'Something went wrong. We could not make a connection with the server.','woocommerce-csvimport' ),
 			'done' 	=> __( 'Done','woocommerce-csvimport' ),
 			'start' => __( 'Starting','woocommerce-csvimport'),
 		);

@@ -15,16 +15,17 @@ class woocsvExportAdmin
     public function menu ()
     {
         //export sub page
-        add_submenu_page( 'woocsv_import', 'Export', __('Export','woocommerce-csvimport'), 'manage_options', 'woocsv-export', array($this, 'content'));
+        add_submenu_page( 'woocsv_import', 'Export', __('Export','woocommerce-csvimport'), 'manage_woocommerce', 'woocsv-export', array($this, 'content'));
 
     }
 
     public function content ()
     {
         global $wpdb;
+
         if (isset($_POST[ 'action' ]) && $_POST[ 'action' ] == 'export') {
             delete_option('woocsv_export_current');
-            $this->export();
+            //$this->export();
         }
 
         $woocsv_export_current = get_option( 'woocsv_export_current' );

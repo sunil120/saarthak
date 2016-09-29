@@ -16,7 +16,7 @@
 <?php foreach ($files as $file) : ?>
     <span>
         <a target="_blank"
-           href="<?php echo $upload_dir[ 'baseurl' ] . '/' . basename( $file ) ?>"><?php echo basename( $file ) ?></a>
+           href="<?php echo $upload_dir[ 'baseurl' ] . '/' . basename($file) ?>"><?php echo basename($file) ?></a>
 
         <a class="delete dashicons dashicons-dismiss" href="#" data-file-name="<?php echo $file; ?>" download>
             <span class=""></span>
@@ -66,6 +66,10 @@
                     var newFormData = {};
                     newFormData.action = 'woocsv_export';
                     doAjaxExport(newFormData);
+                },
+                error: function (data) {
+                    console.log(data);
+                    alert(strings.error);
                 }
             });
 

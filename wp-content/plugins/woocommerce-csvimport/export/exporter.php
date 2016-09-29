@@ -2,7 +2,6 @@
 
 namespace AEM\exporter;
 
-
 function woocsv_export() {
     return woocsvExport::instance();
 }

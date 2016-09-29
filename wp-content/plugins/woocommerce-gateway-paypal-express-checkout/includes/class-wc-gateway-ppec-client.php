@@ -39,8 +39,11 @@ class WC_Gateway_PPEC_Client {
 	 *
 	 */
 	public function __construct( $credential, $environment = 'live' ) {
-		$this->_credential  = $credential;
 		$this->_environment = $environment;
+
+		if ( is_a( $credential, 'WC_Gateway_PPEC_Client_Credential' ) ) {
+			$this->set_credential( $credential );
+		}
 	}
 
 	/**
@@ -50,6 +53,26 @@ class WC_Gateway_PPEC_Client {
 	 */
 	public function set_credential( WC_Gateway_PPEC_Client_Credential $credential ) {
 		$this->_credential = $credential;
+	}
+
+	/**
+	 * Get payer ID from API.
+	 */
+	public function get_payer_id() {
+		$option_key = 'woocommerce_ppec_payer_id_' . $this->_environment . '_' . md5( $this->_credential->get_username() . ':' . $this->_credential->get_password() );
+
+		if ( $payer_id = get_option( $option_key ) ) {
+			return $payer_id;
+		} else {
+			$result = $this->get_pal_details();
+
+			if ( ! empty( $result['PAL'] ) ) {
+				update_option( $option_key, wc_clean( $result['PAL'] ) );
+				return $payer_id;
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -95,15 +118,15 @@ class WC_Gateway_PPEC_Client {
 
 			// Make sure $_credential and $_environment have been configured.
 			if ( ! $this->_credential ) {
-				throw new Exception( __( 'Missing credential', 'woocommerce-gateway-ppec' ), self::INVALID_CREDENTIAL_ERROR );
+				throw new Exception( __( 'Missing credential', 'woocommerce-gateway-paypal-express-checkout' ), self::INVALID_CREDENTIAL_ERROR );
 			}
 
 			if ( ! is_a( $this->_credential, 'WC_Gateway_PPEC_Client_Credential' ) ) {
-				throw new Exception( __( 'Invalid credential object', 'woocommerce-gateway-ppec' ), self::INVALID_CREDENTIAL_ERROR );
+				throw new Exception( __( 'Invalid credential object', 'woocommerce-gateway-paypal-express-checkout' ), self::INVALID_CREDENTIAL_ERROR );
 			}
 
 			if ( ! in_array( $this->_environment, array( 'live', 'sandbox' ) ) ) {
-				throw new Exception( __( 'Invalid environment', 'woocommerce-gateway-ppec' ), self::INVALID_ENVIRONMENT_ERROR );
+				throw new Exception( __( 'Invalid environment', 'woocommerce-gateway-paypal-express-checkout' ), self::INVALID_ENVIRONMENT_ERROR );
 			}
 
 			// First, add in the necessary credential parameters.
@@ -113,6 +136,7 @@ class WC_Gateway_PPEC_Client {
 				'body'        => $body,
 				'user-agent'  => __CLASS__,
 				'httpversion' => '1.1',
+				'timeout'     => 30,
 			);
 
 			// For cURL transport.
@@ -125,13 +149,13 @@ class WC_Gateway_PPEC_Client {
 			wc_gateway_ppec_log( sprintf( '%s: response from remote request to %s: %s', __METHOD__, $this->get_endpoint(), print_r( $resp, true ) ) );
 
 			if ( is_wp_error( $resp ) ) {
-				throw new Exception( sprintf( __( 'An error occurred while trying to connect to PayPal: %s', 'woocommerce-gateway-ppec' ), $resp->get_error_message() ), self::REQUEST_ERROR );
+				throw new Exception( sprintf( __( 'An error occurred while trying to connect to PayPal: %s', 'woocommerce-gateway-paypal-express-checkout' ), $resp->get_error_message() ), self::REQUEST_ERROR );
 			}
 
 			parse_str( wp_remote_retrieve_body( $resp ), $result );
 
 			if ( ! array_key_exists( 'ACK', $result ) ) {
-				throw new Exception( __( 'Malformed response received from PayPal', 'woocommerce-gateway-ppec' ), self::REQUEST_ERROR );
+				throw new Exception( __( 'Malformed response received from PayPal', 'woocommerce-gateway-paypal-express-checkout' ), self::REQUEST_ERROR );
 			}
 
 			wc_gateway_ppec_log( sprintf( '%s: acknowleged response body: %s', __METHOD__, print_r( $result, true ) ) );
@@ -288,6 +312,8 @@ class WC_Gateway_PPEC_Client {
 				throw new PayPal_API_Exception( $result );
 			}
 		}
+
+		update_option( 'woocommerce_ppec_payer_id_' . $this->_environment . '_' . md5( $this->_credential->get_username() . ':' . $this->_credential->get_password() ), wc_clean( $result['PAL'] ) );
 
 		return $result['PAL'];
 	}

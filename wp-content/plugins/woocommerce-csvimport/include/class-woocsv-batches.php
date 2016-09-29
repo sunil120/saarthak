@@ -132,9 +132,11 @@ class woocsv_batches
         return substr ( md5 ( uniqid ( mt_rand (), true ) ), 0, 10 );
     }
 
+
     /**
-     * @param array $post_data
-     * @param string $status
+     * @param null $batch_code
+     * @param $data
+     * @return bool
      */
     static function update ( $batch_code = null, $data ) {
 
@@ -159,6 +161,8 @@ class woocsv_batches
 
         $batches[$batch_code] = $batch;
         update_option ( 'woocsv_batches', $batches );
+
+        return true;
     }
 
     /**

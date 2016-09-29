@@ -23,7 +23,7 @@ class csvWriter implements writerInterface
         $this->load();
 
         if ( ! $this->current_run) {
-            retrurn;
+            return;
         }
 
         $fp = fopen( $this->current_run[ 'filename' ], 'a' );
